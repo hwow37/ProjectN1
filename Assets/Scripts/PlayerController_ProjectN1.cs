@@ -5,18 +5,14 @@ using UnityEngine;
 public class PlayerController_ProjectN1 : MonoBehaviour
 {
     public CharacterController_ProjectN1 controller;
-    public Shooting shooting;
-    public Attacking attacking;
     public Animator playerAnim;
     public Rigidbody2D m_RigidbodyWeapon;
 
-    // for checking Ceiling
-    [SerializeField] private Transform m_CeilingCheck;
+    // for checking Ground
     [SerializeField] private Transform m_GroundCheck;
     [SerializeField] private Transform m_FireCheck;
     [SerializeField] private LayerMask m_WhatIsGround;
     const float k_GroundedRadius = .1f;
-    const float k_CeilingRadius = .1f;
     const float k_FireRadius = .1f;
 
     // for setting right Dir
@@ -25,26 +21,22 @@ public class PlayerController_ProjectN1 : MonoBehaviour
     private bool m_flip = false;
     private bool isRight = true;
 
-    // for moving
-    [Range(0, 100f)] public float runSpeed = 40f;
-    private float horizontalMove = 0f;
-
     // for jumping
-    private bool jump = false;
+    public JumpBar jumpBar;
     private float jumpPressure = 100f;
+    private float jumpRate = 0.5f;
+    private float nextJump = 0.0f;
+    private bool jump = false;
+    private bool isCrouching = false;
     const float minJumpPressure = 150f;
     const float maxJumpPressure = 1000f;
-    public JumpBar jumpBar;
-    public float jumpRate = 0.5f;
-    private float nextJump = 0.0f;
-    private bool isCrouching = false;
 
-    // for Shooting
+    // for shooting
     private float angle;
     private float x = 0, y = 0;
-    public float fireRate = 0.5f;
+    private float fireRate = 0.5f;
     private float nextFire = 0.0f;
-    public float attackRate = 0.5f;
+    private float attackRate = 0.5f;
     private float nextAttack = 0.0f;
 
     void Update()
@@ -100,10 +92,10 @@ public class PlayerController_ProjectN1 : MonoBehaviour
             isRight = true;
         }
 
-        // Shooting recoil
+        // Shooting Recoil
         if (Input.GetButtonDown("FireBullet") && Time.time > nextFire && !Physics2D.OverlapCircle(m_FireCheck.position, k_FireRadius, m_WhatIsGround) && !isCrouching)
         {
-            shooting.Shoot();
+            controller.Shoot();
             nextFire = Time.time + fireRate;
 
             if (angle > 0)
@@ -151,21 +143,20 @@ public class PlayerController_ProjectN1 : MonoBehaviour
             if (xDir < 90)
             {
                 m_RigidbodyWeapon.AddForce(new Vector2((90 - xDir) * 2f, 0f));
-                attacking.Attack();
+                controller.Attack();
             }
             // Left direction
             else
             {
                 m_RigidbodyWeapon.AddForce(new Vector2(-(xDir - 90) * 2f, 0f));
-                attacking.Attack_L();
+                controller.Attack_L();
             }
         }
     }
 
-
     void FixedUpdate()
     {
-        controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump, jumpPressure);
+        controller.Jump(jump, jumpPressure);
         if (m_flip)
         {
             controller.FlipFace();

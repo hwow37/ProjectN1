@@ -4,12 +4,12 @@ using UnityEngine.Events;
 public class CharacterController_ProjectN1 : MonoBehaviour
 {
     public Rigidbody2D m_RigidbodyCharacter;
-    
+
     // for checking Ground
     [SerializeField] private LayerMask m_WhatIsGround;
     [SerializeField] private Transform m_GroundCheck;
-    const float k_GroundedRadius = .2f;
     private bool m_Grounded;
+    const float k_GroundedRadius = .2f;
 
     // for setting right Dir
     private bool m_FacingRight = true;
@@ -17,10 +17,21 @@ public class CharacterController_ProjectN1 : MonoBehaviour
     // for moving
     const float maxSpeed = 600f;
 
+    // for shooting
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private GameObject bulletPrefab;
+    private float bulletForce = 20f;
+
+    // for attacking
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private GameObject attackEffect;
+    [SerializeField] private GameObject attackEffect_L;
+
     [Header("Events")]
     [Space]
 
     public UnityEvent OnLandEvent;
+
     private void Awake()
     {
         if (OnLandEvent == null)
@@ -46,7 +57,7 @@ public class CharacterController_ProjectN1 : MonoBehaviour
         }
     }
 
-    public void Move(float move, bool crouch, bool jump, float jumpPressure)
+    public void Jump(bool jump, float jumpPressure)
     {
         // If the player should jump
         if (m_Grounded && jump)
@@ -85,5 +96,22 @@ public class CharacterController_ProjectN1 : MonoBehaviour
         Vector3 theScale = m_RigidbodyCharacter.transform.localScale;
         theScale.x *= -1;
         m_RigidbodyCharacter.transform.localScale = theScale;
+    }
+
+    public void Shoot()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        rb.AddForce(firePoint.up * bulletForce, ForceMode2D.Impulse);
+    }
+
+    public void Attack()
+    {
+        GameObject effect = Instantiate(attackEffect, attackPoint.position, attackPoint.rotation);
+    }
+
+    public void Attack_L()
+    {
+        GameObject effect = Instantiate(attackEffect_L, attackPoint.position, attackPoint.rotation);
     }
 }

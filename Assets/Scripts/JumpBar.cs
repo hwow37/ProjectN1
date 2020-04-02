@@ -13,14 +13,12 @@ public class JumpBar : MonoBehaviour
     {
         slider.maxValue = jump;
         slider.value = jump;
-
         fill.color = gradient.Evaluate(1f);
     }
 
     public void SetJump(float jump)
     {
         slider.value = jump;
-
         fill.color = gradient.Evaluate(slider.normalizedValue);
     }
 }
