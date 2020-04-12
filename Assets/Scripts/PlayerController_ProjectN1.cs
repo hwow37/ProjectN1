@@ -7,6 +7,8 @@ public class PlayerController_ProjectN1 : MonoBehaviour
     public CharacterController_ProjectN1 controller;
     public Animator playerAnim;
     public Rigidbody2D m_RigidbodyWeapon;
+    public Player player;
+    public Player playerWeapon;
 
     // for checking Ground
     [SerializeField] private Transform m_GroundCheck;
@@ -41,8 +43,22 @@ public class PlayerController_ProjectN1 : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetButtonDown("Load") && !PauseMenu.GameIsPaused) {
+            Debug.Log("Loaded");
+            PlayerData data = SaveSystem.LoadPlayer();
+
+            Vector2 position;
+            position.x = data.position[0];
+            position.y = data.position[1];
+
+            player.transform.position = position;
+            position.y = data.position[1] - 0.161f;
+            playerWeapon.transform.position = position;
+        }
+
         // Crouch
-        if (Input.GetButton("Crouch") && Physics2D.OverlapCircle(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround) && Time.time > nextJump)
+        if (Input.GetButton("Crouch") && Physics2D.OverlapCircle(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround)
+            && Time.time > nextJump && !PauseMenu.GameIsPaused)
         {
             isCrouching = true;
             playerAnim.SetBool("IsCrouching", true);
@@ -56,7 +72,8 @@ public class PlayerController_ProjectN1 : MonoBehaviour
             }
             jumpBar.SetJump(jumpPressure);
         }
-        else if (Input.GetButtonUp("Crouch") && Physics2D.OverlapCircle(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround) && isCrouching)
+        else if (Input.GetButtonUp("Crouch") && Physics2D.OverlapCircle(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround)
+                 && isCrouching && !PauseMenu.GameIsPaused)
         {
             if (jumpPressure < minJumpPressure)
             {
@@ -93,7 +110,8 @@ public class PlayerController_ProjectN1 : MonoBehaviour
         }
 
         // Shooting Recoil
-        if (Input.GetButtonDown("FireBullet") && Time.time > nextFire && !Physics2D.OverlapCircle(m_FireCheck.position, k_FireRadius, m_WhatIsGround) && !isCrouching)
+        if (Input.GetButtonDown("FireBullet") && Time.time > nextFire && !Physics2D.OverlapCircle(m_FireCheck.position, k_FireRadius, m_WhatIsGround)
+            && !isCrouching && !PauseMenu.GameIsPaused)
         {
             controller.Shoot();
             nextFire = Time.time + fireRate;
@@ -135,9 +153,9 @@ public class PlayerController_ProjectN1 : MonoBehaviour
         }
 
         // Attack
-        if (Input.GetButtonDown("AttackWeapon") && Time.time > nextAttack && !isCrouching)
+        if (Input.GetButtonDown("AttackWeapon") && Time.time > nextAttack && !isCrouching && !PauseMenu.GameIsPaused)
         {
-            // Rigth direction;
+            // Rigth direction
             nextAttack = Time.time + attackRate;
             float xDir = Mathf.Abs(angle);
             if (xDir < 90)
