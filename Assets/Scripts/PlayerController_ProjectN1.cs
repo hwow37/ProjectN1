@@ -4,11 +4,9 @@ using UnityEngine;
 
 public class PlayerController_ProjectN1 : MonoBehaviour
 {
-    public CharacterController_ProjectN1 controller;
     public Animator playerAnim;
-    public Rigidbody2D m_RigidbodyWeapon;
-    public Player player;
-    public Player playerWeapon;
+    public GameObject player;
+    public GameObject playerWeapon;
 
     // for checking Ground
     [SerializeField] private Transform m_GroundCheck;
@@ -16,24 +14,27 @@ public class PlayerController_ProjectN1 : MonoBehaviour
     [SerializeField] private LayerMask m_WhatIsGround;
     const float k_GroundedRadius = .1f;
     const float k_FireRadius = .1f;
+    private bool m_Grounded = true;
 
     // for setting right Dir
     [SerializeField] private Camera cam;
+    private Vector3 temp_theScale;
     private Vector2 mousePos;
-    private bool m_flip = false;
     private bool isRight = true;
 
     // for jumping
-    public JumpBar jumpBar;
+    [SerializeField] private JumpBar jumpBar;
     private float jumpPressure = 100f;
     private float jumpRate = 0.5f;
     private float nextJump = 0.0f;
-    private bool jump = false;
     private bool isCrouching = false;
     const float minJumpPressure = 150f;
     const float maxJumpPressure = 1000f;
 
     // for shooting
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private GameObject bulletPrefab;
+    private float bulletForce = 20f;
     private float angle;
     private float x = 0, y = 0;
     private float fireRate = 0.5f;
@@ -41,19 +42,27 @@ public class PlayerController_ProjectN1 : MonoBehaviour
     private float attackRate = 0.5f;
     private float nextAttack = 0.0f;
 
+    // for attacking
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private GameObject attackEffect;
+    [SerializeField] private GameObject attackEffect_L;
+
+    // for Setting UI and Menu
+    public GameObject playerUI;
+    public TravelMenu travelMenu;
+
+    private void Start()
+    {
+        temp_theScale = player.transform.localScale;
+    }
+
     void Update()
     {
-        if (Input.GetButtonDown("Load") && !PauseMenu.GameIsPaused) {
-            Debug.Log("Loaded");
-            PlayerData data = SaveSystem.LoadPlayer();
-
-            Vector2 position;
-            position.x = data.position[0];
-            position.y = data.position[1];
-
-            player.transform.position = position;
-            position.y = data.position[1] - 0.161f;
-            playerWeapon.transform.position = position;
+        // Travel in RestArea
+        if (Input.GetButtonDown("Interact") && !PauseMenu.GameIsPaused && RestArea.inRestArea && !TravelMenu.inTravelMenu)
+        {
+            playerUI.SetActive(false);
+            travelMenu.SetTravelMenu(true);
         }
 
         // Crouch
@@ -81,31 +90,29 @@ public class PlayerController_ProjectN1 : MonoBehaviour
             }
 
             nextJump = Time.time + jumpRate;
-            jump = true;
+
+            Jump(jumpPressure);
             isCrouching = false;
+
+            playerAnim.SetBool("IsJumping", true);
             playerAnim.SetBool("IsCrouching", false);
         }
 
         // Check Falling
-        if (m_RigidbodyWeapon.velocity.y < -0.1)
+        if (playerWeapon.GetComponent<Rigidbody2D>().velocity.y < -0.1)
         {
+            m_Grounded = false;
             playerAnim.SetBool("IsFalling", true);
-        }
-        else
-        {
-            playerAnim.SetBool("IsFalling", false);
         }
 
         // Face Mouse
         mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-        if (mousePos.x - m_RigidbodyWeapon.position.x < 0 && isRight)
+        if (mousePos.x - playerWeapon.GetComponent<Rigidbody2D>().position.x < 0)
         {
-            m_flip = true;
             isRight = false;
         }
-        else if (mousePos.x - m_RigidbodyWeapon.position.x >= 0 && !isRight)
+        else if (mousePos.x - playerWeapon.GetComponent<Rigidbody2D>().position.x >= 0)
         {
-            m_flip = true;
             isRight = true;
         }
 
@@ -113,7 +120,7 @@ public class PlayerController_ProjectN1 : MonoBehaviour
         if (Input.GetButtonDown("FireBullet") && Time.time > nextFire && !Physics2D.OverlapCircle(m_FireCheck.position, k_FireRadius, m_WhatIsGround)
             && !isCrouching && !PauseMenu.GameIsPaused)
         {
-            controller.Shoot();
+            Shoot();
             nextFire = Time.time + fireRate;
 
             if (angle > 0)
@@ -123,14 +130,14 @@ public class PlayerController_ProjectN1 : MonoBehaviour
                 {
                     x = 90 - angle;
                     y = angle;
-                    m_RigidbodyWeapon.AddForce(new Vector2(-2f * x, -2f * y));
+                    player.GetComponent<Rigidbody2D>().AddForce(new Vector2(-2f * x, -2f * y));
                 }
                 // 2 quadrant
                 else
                 {
                     x = angle - 90;
                     y = 180 - angle;
-                    m_RigidbodyWeapon.AddForce(new Vector2(2f * x, -2f * y));
+                    player.GetComponent<Rigidbody2D>().AddForce(new Vector2(2f * x, -2f * y));
                 }
             }
             else
@@ -140,14 +147,14 @@ public class PlayerController_ProjectN1 : MonoBehaviour
                 {
                     x = angle + 90;
                     y = 180 + angle;
-                    m_RigidbodyWeapon.AddForce(new Vector2(-2f * x, 2f * y));
+                    player.GetComponent<Rigidbody2D>().AddForce(new Vector2(-2f * x, 2f * y));
                 }
                 // 4 quadrant
                 else
                 {
                     x = 90 + angle;
                     y = angle;
-                    m_RigidbodyWeapon.AddForce(new Vector2(-2f * x, -2f * y));
+                    player.GetComponent<Rigidbody2D>().AddForce(new Vector2(-2f * x, -2f * y));
                 }
             }
         }
@@ -160,43 +167,94 @@ public class PlayerController_ProjectN1 : MonoBehaviour
             float xDir = Mathf.Abs(angle);
             if (xDir < 90)
             {
-                m_RigidbodyWeapon.AddForce(new Vector2((90 - xDir) * 2f, 0f));
-                controller.Attack();
+                playerWeapon.GetComponent<Rigidbody2D>().AddForce(new Vector2((90 - xDir) * 2f, 0f));
+                Attack();
             }
             // Left direction
             else
             {
-                m_RigidbodyWeapon.AddForce(new Vector2(-(xDir - 90) * 2f, 0f));
-                controller.Attack_L();
+                playerWeapon.GetComponent<Rigidbody2D>().AddForce(new Vector2(-(xDir - 90) * 2f, 0f));
+                Attack_L();
             }
         }
     }
 
     void FixedUpdate()
     {
-        controller.Jump(jump, jumpPressure);
-        if (m_flip)
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+        for (int i = 0; i < colliders.Length; i++)
         {
-            controller.FlipFace();
-            m_flip = false;
+            if (colliders[i].gameObject != gameObject)
+            {
+                if (!m_Grounded)
+                {
+                    m_Grounded = true;
+                    OnLanding();
+                }
+            }
         }
-        jump = false;
 
+        SetFace();
         faceMouse();
     }
 
     public void OnLanding()
     {
         jumpPressure = 0f;
-
         playerAnim.SetBool("IsJumping", false);
         playerAnim.SetBool("IsFalling", false);
+        Vector2 position = player.transform.position;
+        position.y -= 0.161f;
+        playerWeapon.transform.position = position;
     }
 
     void faceMouse()
     {
-        Vector3 lookDir = mousePos - m_RigidbodyWeapon.position;
+        Vector3 lookDir = mousePos - playerWeapon.GetComponent<Rigidbody2D>().position;
         angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-        m_RigidbodyWeapon.rotation = angle;
+        playerWeapon.GetComponent<Rigidbody2D>().rotation = angle;
+    }
+
+    public void Jump(float jumpPressure)
+    {
+        if (isRight)
+        {
+            player.GetComponent<Rigidbody2D>().AddForce(new Vector2(300f, jumpPressure));
+        }
+        else
+        {
+            player.GetComponent<Rigidbody2D>().AddForce(new Vector2(-300f, jumpPressure));
+        }
+    }
+
+    public void SetFace()
+    {
+        Vector3 theScale = player.transform.localScale;
+        if (!isRight)
+        {
+            theScale.x = -temp_theScale.x;
+        }
+        else
+        {
+            theScale.x = temp_theScale.x;
+        }
+        player.transform.localScale = theScale;
+    }
+
+    public void Shoot()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        rb.AddForce(firePoint.up * bulletForce, ForceMode2D.Impulse);
+    }
+
+    public void Attack()
+    {
+        GameObject effect = Instantiate(attackEffect, attackPoint.position, attackPoint.rotation);
+    }
+
+    public void Attack_L()
+    {
+        GameObject effect = Instantiate(attackEffect_L, attackPoint.position, attackPoint.rotation);
     }
 }

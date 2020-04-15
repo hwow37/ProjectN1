@@ -4,6 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public static class SaveSystem
 {
+    // Save
     public static void SavePlayer(Player player)
     {
         BinaryFormatter formatter = new BinaryFormatter();
@@ -17,6 +18,7 @@ public static class SaveSystem
         stream.Close();
     }
 
+    // Load
     public static PlayerData LoadPlayer()
     {
         string path = Application.persistentDataPath + "/player.neo";

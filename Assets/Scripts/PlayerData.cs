@@ -7,15 +7,21 @@ public class PlayerData
 {
     public int level;
     public int health;
-    public float[] position;
+    public float[] last_saved_position;
+
+    // Check unvisited area
+    //public bool[] unlocked_restarea;
 
     public PlayerData (Player player)
     {
         level = player.level;
         health = player.health;
 
-        position = new float[2];
-        position[0] = player.transform.position.x;
-        position[1] = player.transform.position.y;
+        last_saved_position = new float[3];
+        last_saved_position[0] = RestArea.lastSavedPosition.x;
+        last_saved_position[1] = RestArea.lastSavedPosition.y;
+        last_saved_position[2] = RestArea.lastSavedPosition.z;
+
+        //unlocked_restarea = new bool[2];
     }
 }
