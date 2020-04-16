@@ -27,6 +27,7 @@ public class TravelMenu : MonoBehaviour
         {
             Vector2 position = restAreaSystem.GetPosition_RestArea(areaNum);
 
+            position.y = position.y - 0.37f;
             player.transform.position = position;
             position.y = position.y - 0.161f;
             playerWeapon.transform.position = position;

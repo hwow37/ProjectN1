@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public Player playerWeapon;
     public int level = 1;
     public int health = 30;
     private float[] last_saved_position;
@@ -31,5 +32,7 @@ public class Player : MonoBehaviour
         position.y = data.last_saved_position[1];
         position.z = data.last_saved_position[2];
         transform.position = position;
+        position.y = position.y - 0.161f;
+        playerWeapon.transform.position = position;
     }
 }

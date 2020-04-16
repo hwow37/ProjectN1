@@ -1013,9 +1013,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc5bfb5fa856e38428f7301dbe033cf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerWeapon: {fileID: 1120137155}
   level: 1
   health: 30
-  last_saved_position: []
 --- !u!61 &435000608
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1052,7 +1052,6 @@ GameObject:
   m_Component:
   - component: {fileID: 450772513}
   - component: {fileID: 450772514}
-  - component: {fileID: 450772515}
   m_Layer: 0
   m_Name: PlayerController
   m_TagString: Untagged
@@ -1106,46 +1105,6 @@ MonoBehaviour:
     type: 3}
   playerUI: {fileID: 1242097643}
   travelMenu: {fileID: 1246214616}
---- !u!114 &450772515
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 450772512}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c72319493bf592849ba73492350b74a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RigidbodyCharacter: {fileID: 435000602}
-  playController_ProjectN1: {fileID: 450772514}
-  m_WhatIsGround:
-    serializedVersion: 2
-    m_Bits: 567
-  m_GroundCheck: {fileID: 698382714}
-  firePoint: {fileID: 912850725}
-  bulletPrefab: {fileID: 2640405716746951138, guid: b5534f1203c4c534f80951e6f510eb33,
-    type: 3}
-  attackPoint: {fileID: 682872821}
-  attackEffect: {fileID: 7800511418495926715, guid: c32f9dff8e67ed547bde8095082d1eb7,
-    type: 3}
-  attackEffect_L: {fileID: 3848587920019585360, guid: 96a5286125f8cbc418e07fab966d6fa4,
-    type: 3}
-  OnLandEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 450772514}
-        m_MethodName: OnLanding
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &481827363
 GameObject:
   m_ObjectHideFlags: 0
@@ -7503,6 +7462,50 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.175, y: 1.93}
   m_EdgeRadius: 0
+--- !u!1 &946104791
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 946104792}
+  - component: {fileID: 946104793}
+  m_Layer: 0
+  m_Name: GameMasterSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &946104792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 946104791}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.08, y: 1.8581264, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &946104793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 946104791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5847e47e5a588824980770dfc2e082ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 435000607}
 --- !u!1 &969690377
 GameObject:
   m_ObjectHideFlags: 0
@@ -8245,9 +8248,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc5bfb5fa856e38428f7301dbe033cf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerWeapon: {fileID: 0}
   level: 1
   health: 30
-  last_saved_position: []
 --- !u!1 &1211218154
 GameObject:
   m_ObjectHideFlags: 0
@@ -8493,7 +8496,6 @@ MonoBehaviour:
   fill: {fileID: 1838019578}
   textDarkEnergy: {fileID: 481827363}
   textLightEnergy: {fileID: 50096727}
-  animationTime: 1.5
 --- !u!1 &1246214611
 GameObject:
   m_ObjectHideFlags: 0

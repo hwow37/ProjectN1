@@ -20,6 +20,7 @@ public class RestArea : MonoBehaviour
         if (other.transform.tag == "PlayerToSave")
         {
             lastSavedPosition = this.transform.position;
+            lastSavedPosition.y -= 0.37f;
             lastRestAreaNum = restAreaSystem.GetNum_RestArea(gameObject.name);
             inRestArea = true;
             player.SavePlayer();
